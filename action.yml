@@ -1,11 +1,20 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: "Flash Particle Device Action"
+description: "Flash compiled firmware to a device"
+author: "Particle, Inc."
 inputs:
-  milliseconds: # change this
+  particle-access-token:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: "Particle API access token with permission to flash devices"
+  device-id:
+    required: true
+    description: "Device ID of the device to be targeted"
+  firmware-path:
+    required: true
+    description: "Path to firmware binary"
+  timeout-ms:
+    required: false
+    default: "300000"
+    description: "Time in ms to wait for the device to come back online after flashing"
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node16"
+  main: "dist/index.js"
