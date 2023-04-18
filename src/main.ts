@@ -7,25 +7,25 @@ export async function waitForDeviceToComeOnline(
   deviceId: string,
   accessToken: string,
   timeoutMs: number
-): Promise<void> {
+): Promise<boolean> {
   const stream = await particle.getEventStream({
     deviceId,
     auth: accessToken,
     name: 'spark/status'
   })
 
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<boolean>((resolve, reject) => {
     const flashTimeout = setTimeout(
       () =>
         reject(new Error('timed out waiting for device to come back online')),
       timeoutMs
     )
-
+    console.log('waiting for device to come online')
     stream.on('event', (data: {data: string}) => {
       if (data.data === 'online') {
         stream.cancel()
         clearTimeout(flashTimeout)
-        resolve()
+        resolve(true)
       }
     })
   })
@@ -86,4 +86,4 @@ export async function run(): Promise<void> {
   }
 }
 
-run()
+// run()
