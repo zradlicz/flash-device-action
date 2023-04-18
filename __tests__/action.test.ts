@@ -1,5 +1,5 @@
 import {expect, test, jest} from '@jest/globals'
-import {run, waitForDeviceToComeOnline} from '../src/main'
+import {run, waitForDeviceToComeOnline} from '../src/action'
 import * as core from '@actions/core'
 import {EventEmitter} from 'events'
 
