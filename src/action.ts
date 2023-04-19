@@ -61,8 +61,6 @@ export async function run(): Promise<void> {
     const firmwarePath = core.getInput('firmware-path')
     const timeoutMs = parseInt(core.getInput('timeout-ms'), 10)
 
-    // eslint-disable-next-line no-console
-    console.log(accessToken)
     if (!validAccessToken(accessToken)) {
       throw new Error('invalid access token')
     }
