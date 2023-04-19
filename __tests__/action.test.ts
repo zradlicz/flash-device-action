@@ -48,8 +48,9 @@ test('test device is online', async () => {
   expect(result).toEqual(true)
 })
 
-
 test('test timeout while waiting for device to come online', async () => {
   const result = waitForDeviceToComeOnline('test-device', '1000', 1000)
-  return expect(result).rejects.toThrow('timed out waiting for device to come back online')
+  return expect(result).rejects.toThrow(
+    'timed out waiting for device to come back online'
+  )
 })
