@@ -20,12 +20,19 @@ export async function waitForDeviceToComeOnline(
         reject(new Error('timed out waiting for device to come back online')),
       timeoutMs
     )
-    console.log('waiting for device to come online')
-    stream.on('event', (data: {data: string}) => {
-      if (data.data === 'online') {
-        stream.cancel()
-        clearTimeout(flashTimeout)
-        resolve(true)
+    core.info('waiting for device to come online')
+    stream.on('event', (event: {data: string}) => {
+      try {
+        if (event.data === 'online') {
+          core.info('device is online')
+          clearTimeout(flashTimeout)
+          stream.abort()
+          stream.stopIdleTimeout()
+          resolve(true)
+        }
+      } catch (error) {
+        if (error instanceof Error) core.debug(error.message)
+        reject(new Error('error waiting for device to come online'))
       }
     })
   })

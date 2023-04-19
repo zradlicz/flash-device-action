@@ -17,6 +17,12 @@ class MockEventStream extends EventEmitter {
   cancel() {
     return
   }
+  abort() {
+    return
+  }
+  stopIdleTimeout() {
+    return
+  }
 }
 
 const mockEventStream = new MockEventStream()
