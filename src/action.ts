@@ -3,6 +3,28 @@ import * as core from '@actions/core'
 import ParticleApi from 'particle-api-js'
 const particle = new ParticleApi()
 
+interface FlashFirmwareOptions {
+  accessToken: string
+  deviceId: string
+  firmwarePath: string
+  timeoutMs: number
+}
+
+export async function flashFirmware(
+  inputs: FlashFirmwareOptions
+): Promise<void> {
+  const {accessToken, deviceId, firmwarePath, timeoutMs} = inputs
+
+  // Flash the device
+  await particle.flashDevice({
+    deviceId,
+    files: {file: firmwarePath},
+    auth: accessToken
+  })
+
+  // Wait for the flash to complete
+  await waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs)
+}
 export async function waitForDeviceToComeOnline(
   deviceId: string,
   accessToken: string,
@@ -38,19 +60,19 @@ export async function waitForDeviceToComeOnline(
   })
 }
 
-function validAccessToken(accessToken: string): boolean {
+export function validAccessToken(accessToken: string): boolean {
   return accessToken.length === 40
 }
 
-function validDeviceId(deviceId: string): boolean {
+export function validDeviceId(deviceId: string): boolean {
   return deviceId.length === 24
 }
 
-function validTimeoutMs(timeoutMs: number): boolean {
+export function validTimeoutMs(timeoutMs: number): boolean {
   return timeoutMs > 0
 }
 
-function validFirmwarePath(firmwarePath: string): boolean {
+export function validFirmwarePath(firmwarePath: string): boolean {
   return firmwarePath.length > 0
 }
 
@@ -77,15 +99,12 @@ export async function run(): Promise<void> {
       throw new Error('invalid firmware path')
     }
 
-    // Flash the device
-    await particle.flashDevice({
+    await flashFirmware({
+      accessToken,
       deviceId,
-      files: {file: firmwarePath},
-      auth: accessToken
+      firmwarePath,
+      timeoutMs
     })
-
-    // Wait for the flash to complete
-    await waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
