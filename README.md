@@ -1,105 +1,63 @@
-<p align="center">
-  <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
-</p>
+# Particle Flash Device Action
+[![Build and Test](https://github.com/particle-iot/flash-device-action/actions/workflows/test.yml/badge.svg)](https://github.com/particle-iot/flash-device-action/actions/workflows/test.yml)
 
-# Create a JavaScript Action using TypeScript
+A GitHub Action to flash Particle devices with application firmware
 
-Use this template to bootstrap the creation of a TypeScript action.:rocket:
+> This project is currently under development with no stable v1 release yet. 
+  Documentation refers to the `main` branch, but please be aware that stability guarantees are not provided at this stage.
 
-This template includes compilation support, tests, a validation workflow, publishing, and versioning guidance.  
-
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
-
-## Create an action from this template
-
-Click the `Use this Template` and provide the new repo details for your action
-
-## Code in Main
-
-> First, you'll need to have a reasonably modern version of `node` handy. This won't work with versions older than 9, for instance.
-
-Install the dependencies  
-```bash
-$ npm install
-```
-
-Build the typescript and package it for distribution
-```bash
-$ npm run build && npm run package
-```
-
-Run the tests :heavy_check_mark:  
-```bash
-$ npm test
-
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-
-...
-```
-
-## Change action.yml
-
-The action.yml defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-import * as core from '@actions/core';
-...
-
-async function run() {
-  try { 
-      ...
-  } 
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Publish to a distribution branch
-
-Actions are run from GitHub repos so we will checkin the packed dist folder. 
-
-Then run [ncc](https://github.com/zeit/ncc) and push the results:
-```bash
-$ npm run package
-$ git add dist
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
-
-Note: We recommend using the `--license` option for ncc, which will create a license file for all of the production node modules used in your project.
-
-Your action is now published! :rocket: 
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Validate
-
-You can now validate the action by referencing `./` in a workflow in your repo (see [test.yml](.github/workflows/test.yml))
+## Usage
 
 ```yaml
-uses: ./
-with:
-  milliseconds: 1000
+- uses: particle-iot/flash-device-action@main
+  with:
+    # Particle API access token with permission to flash devices
+    # Required: true
+    particle-access-token: ''
+
+    # Device ID of the device to be targeted
+    # Required: true
+    device-id: ''
+    
+    # Path to firmware binary
+    # Required: true
+    firmware-path: ''
+
+    # Time in ms to wait for the device to come back online after flashing
+    # Required: false
+    timeout-ms: '300000'
 ```
 
-See the [actions tab](https://github.com/actions/typescript-action/actions) for runs of this action! :rocket:
+### Example Pipeline
 
-## Usage:
+This is a simple example of a GitHub Actions pipeline that compiles a firmware project and flashes it to a device.
 
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and latest V1 action
+```yaml
+name: Compile and Flash
+
+# on push to the test branch, compile and flash to the test device
+on:
+  push:
+    branches:
+      - test
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Compile firmware
+      id: compile
+      uses: particle-iot/compile-action@main
+      with:
+        particle-platform-name: 'argon'
+        sources-folder: 'src'
+
+    - name: Flash device
+      uses: particle-iot/flash-device-action@main
+      with:
+        particle-access-token: ${{ secrets.PARTICLE_ACCESS_TOKEN }}
+        device-id: 'a3d9e2b1c6f7481234567890'
+        firmware-path: ${{ steps.compile.outputs.artifact-path }}
+```
