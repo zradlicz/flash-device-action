@@ -23189,7 +23189,7 @@ exports.validFirmwarePath = validFirmwarePath;
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const accessToken = core.getInput('access-token');
+            const accessToken = core.getInput('particle-access-token');
             const deviceId = core.getInput('device-id');
             const firmwarePath = core.getInput('firmware-path');
             const timeoutMs = parseInt(core.getInput('timeout-ms'), 10);
