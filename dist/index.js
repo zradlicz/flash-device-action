@@ -23205,12 +23205,14 @@ function run() {
             if (!validFirmwarePath(firmwarePath)) {
                 throw new Error('invalid firmware path');
             }
+            core.info('flashing firmware');
             yield flashFirmware({
                 accessToken,
                 deviceId,
                 firmwarePath,
                 timeoutMs
             });
+            core.info('complete!');
         }
         catch (error) {
             if (error instanceof Error)

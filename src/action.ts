@@ -22,6 +22,8 @@ export async function flashFirmware(
     auth: accessToken
   })
 
+  core.info('firmware update started')
+
   // Wait for the flash to complete
   await waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs)
 }
@@ -99,12 +101,16 @@ export async function run(): Promise<void> {
       throw new Error('invalid firmware path')
     }
 
+    core.info('flashing firmware')
+
     await flashFirmware({
       accessToken,
       deviceId,
       firmwarePath,
       timeoutMs
     })
+
+    core.info('complete!')
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
