@@ -52,7 +52,6 @@ jobs:
       uses: particle-iot/compile-action@main
       with:
         particle-platform-name: 'argon'
-        sources-folder: 'src'
 
     - name: Flash device
       uses: particle-iot/flash-device-action@main
