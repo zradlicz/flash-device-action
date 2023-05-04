@@ -22,6 +22,8 @@ export async function flashFirmware(
     auth: accessToken
   })
 
+  core.info('firmware update started')
+
   // Wait for the flash to complete
   await waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs)
 }
@@ -37,11 +39,12 @@ export async function waitForDeviceToComeOnline(
   })
 
   return new Promise<boolean>((resolve, reject) => {
-    const flashTimeout = setTimeout(
-      () =>
-        reject(new Error('timed out waiting for device to come back online')),
-      timeoutMs
-    )
+    const flashTimeout = setTimeout(() => {
+      stream.abort()
+      stream.stopIdleTimeout()
+      reject(new Error('timed out waiting for device to come back online'))
+    }, timeoutMs)
+
     core.info('waiting for device to come online')
     stream.on('event', (event: {data: string}) => {
       try {
@@ -99,12 +102,16 @@ export async function run(): Promise<void> {
       throw new Error('invalid firmware path')
     }
 
+    core.info('flashing firmware')
+
     await flashFirmware({
       accessToken,
       deviceId,
       firmwarePath,
       timeoutMs
     })
+
+    core.info('complete!')
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

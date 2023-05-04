@@ -23135,6 +23135,7 @@ function flashFirmware(inputs) {
             files: { file: firmwarePath },
             auth: accessToken
         });
+        core.info('firmware update started');
         // Wait for the flash to complete
         yield waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs);
     });
@@ -23148,7 +23149,11 @@ function waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs) {
             name: 'spark/status'
         });
         return new Promise((resolve, reject) => {
-            const flashTimeout = setTimeout(() => reject(new Error('timed out waiting for device to come back online')), timeoutMs);
+            const flashTimeout = setTimeout(() => {
+                stream.abort();
+                stream.stopIdleTimeout();
+                reject(new Error('timed out waiting for device to come back online'));
+            }, timeoutMs);
             core.info('waiting for device to come online');
             stream.on('event', (event) => {
                 try {
@@ -23205,12 +23210,14 @@ function run() {
             if (!validFirmwarePath(firmwarePath)) {
                 throw new Error('invalid firmware path');
             }
+            core.info('flashing firmware');
             yield flashFirmware({
                 accessToken,
                 deviceId,
                 firmwarePath,
                 timeoutMs
             });
+            core.info('complete!');
         }
         catch (error) {
             if (error instanceof Error)
