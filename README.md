@@ -32,6 +32,11 @@ A GitHub Action to flash Particle devices with application firmware
 
 This is a simple example of a GitHub Actions pipeline that compiles a firmware project and flashes it to a device.
 
+You will need to create a GitHub secret named `PARTICLE_ACCESS_TOKEN` with a Particle API access token.
+The access token should be an [API User](https://docs.particle.io/getting-started/cloud/cloud-api/#api-users) token.
+It needs the `devices:update` scope to flash devices.
+
+
 ```yaml
 name: Compile and Flash
 
