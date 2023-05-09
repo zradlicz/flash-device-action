@@ -19,7 +19,10 @@ export async function flashFirmware(
   await particle.flashDevice({
     deviceId,
     files: {file: firmwarePath},
-    auth: accessToken
+    auth: accessToken,
+    headers: {
+      'user-agent': 'particle-flash-device-action'
+    }
   })
 
   core.info('firmware update started')

@@ -165,7 +165,10 @@ describe('run', () => {
       files: {
         file: 'test-firmware-path'
       },
-      auth: 'a'.repeat(40)
+      auth: 'a'.repeat(40),
+      headers: {
+        'user-agent': 'particle-flash-device-action'
+      }
     })
   })
 })
