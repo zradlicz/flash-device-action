@@ -23133,7 +23133,10 @@ function flashFirmware(inputs) {
         yield particle.flashDevice({
             deviceId,
             files: { file: firmwarePath },
-            auth: accessToken
+            auth: accessToken,
+            headers: {
+                'user-agent': 'particle-flash-device-action'
+            }
         });
         core.info('firmware update started');
         // Wait for the flash to complete
