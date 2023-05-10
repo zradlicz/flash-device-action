@@ -66,5 +66,5 @@ jobs:
       with:
         particle-access-token: ${{ secrets.PARTICLE_ACCESS_TOKEN }}
         device-id: 'a3d9e2b1c6f7481234567890'
-        firmware-path: ${{ steps.compile.outputs.artifact-path }}
+        firmware-path: ${{ steps.compile.outputs.firmware-path }}
 ```
