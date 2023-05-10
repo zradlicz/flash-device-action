@@ -3,13 +3,14 @@
 
 A GitHub Action to flash Particle devices with application firmware
 
-> This project is currently under development with no stable v1 release yet. 
-  Documentation refers to the `main` branch, but please be aware that stability guarantees are not provided at this stage.
+Other Actions for firmware development: [Compile](https://github.com/particle-iot/compile-action) | Flash Device | [Firmware Upload](https://github.com/particle-iot/firmware-upload-action)
+
+> This action is currently in public beta. Please [report](https://community.particle.io/) any issues you encounter.
 
 ## Usage
 
 ```yaml
-- uses: particle-iot/flash-device-action@main
+- uses: particle-iot/flash-device-action@v1
   with:
     # Particle API access token with permission to flash devices
     # Required: true
@@ -27,6 +28,8 @@ A GitHub Action to flash Particle devices with application firmware
     # Required: false
     timeout-ms: '300000'
 ```
+
+Also see official [Particle documentation](https://docs.particle.io/firmware/best-practices/github-actions/) for more details.
 
 ### Example Pipeline
 
@@ -54,12 +57,12 @@ jobs:
 
     - name: Compile firmware
       id: compile
-      uses: particle-iot/compile-action@main
+      uses: particle-iot/compile-action@v1
       with:
         particle-platform-name: 'argon'
 
     - name: Flash device
-      uses: particle-iot/flash-device-action@main
+      uses: particle-iot/flash-device-action@v1
       with:
         particle-access-token: ${{ secrets.PARTICLE_ACCESS_TOKEN }}
         device-id: 'a3d9e2b1c6f7481234567890'
