@@ -23126,6 +23126,10 @@ exports.run = exports.validFirmwarePath = exports.validTimeoutMs = exports.valid
 const core = __importStar(__nccwpck_require__(2186));
 const particle_api_js_1 = __importDefault(__nccwpck_require__(2918));
 const particle = new particle_api_js_1.default();
+const headers = {
+    'User-Agent': 'particle-flash-device-action',
+    'x-particle-tool': 'particle-flash-device-action'
+};
 function flashFirmware(inputs) {
     return __awaiter(this, void 0, void 0, function* () {
         const { accessToken, deviceId, firmwarePath, timeoutMs } = inputs;
@@ -23134,9 +23138,7 @@ function flashFirmware(inputs) {
             deviceId,
             files: { file: firmwarePath },
             auth: accessToken,
-            headers: {
-                'user-agent': 'particle-flash-device-action'
-            }
+            headers
         });
         core.info('firmware update started');
         // Wait for the flash to complete
