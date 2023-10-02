@@ -10,6 +10,11 @@ interface FlashFirmwareOptions {
   timeoutMs: number
 }
 
+const headers = {
+  'User-Agent': 'particle-flash-device-action',
+  'x-particle-tool': 'particle-flash-device-action'
+}
+
 export async function flashFirmware(
   inputs: FlashFirmwareOptions
 ): Promise<void> {
@@ -20,9 +25,7 @@ export async function flashFirmware(
     deviceId,
     files: {file: firmwarePath},
     auth: accessToken,
-    headers: {
-      'user-agent': 'particle-flash-device-action'
-    }
+    headers
   })
 
   core.info('firmware update started')

@@ -31,6 +31,11 @@ jest.mock('particle-api-js', () => {
   })
 })
 
+const headers = {
+  'User-Agent': 'particle-flash-device-action',
+  'x-particle-tool': 'particle-flash-device-action'
+}
+
 // Must import particle-api-js after mocking it
 // eslint-disable-next-line import/first
 import {
@@ -166,9 +171,7 @@ describe('run', () => {
         file: 'test-firmware-path'
       },
       auth: 'a'.repeat(40),
-      headers: {
-        'user-agent': 'particle-flash-device-action'
-      }
+      headers
     })
   })
 })
