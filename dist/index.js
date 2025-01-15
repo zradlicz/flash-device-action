@@ -15687,27 +15687,36 @@ function waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs) {
         });
         return new Promise((resolve, reject) => {
             const flashTimeout = setTimeout(() => {
-                stream.abort();
-                stream.stopIdleTimeout();
+                try {
+                    stream.abort();
+                    stream.stopIdleTimeout();
+                }
+                catch (cleanupError) {
+                    core.warning(`Error during stream cleanup: ${cleanupError}`);
+                }
                 reject(new Error('timed out waiting for device to come back online'));
             }, timeoutMs);
             core.info('waiting for device to come online');
-            stream.on('event', (event) => {
+            stream.on('event', (event) => __awaiter(this, void 0, void 0, function* () {
                 try {
                     if (event.data === 'online') {
                         core.info('device is online');
                         clearTimeout(flashTimeout);
-                        stream.abort();
-                        stream.stopIdleTimeout();
+                        try {
+                            stream.abort();
+                            stream.stopIdleTimeout();
+                        }
+                        catch (cleanupError) {
+                            core.warning(`Error during stream cleanup: ${cleanupError}`);
+                        }
                         resolve(true);
                     }
                 }
                 catch (error) {
-                    if (error instanceof Error)
-                        core.debug(error.message);
+                    core.warning(`Error in stream event handler: ${error.message}`);
                     reject(new Error('error waiting for device to come online'));
                 }
-            });
+            }));
         });
     });
 }
