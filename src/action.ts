@@ -71,7 +71,9 @@ export async function waitForDeviceToComeOnline(
           resolve(true)
         }
       } catch (error) {
-        core.warning(`Error in stream event handler: ${(error as Error).message}`)
+        core.warning(
+          `Error in stream event handler: ${(error as Error).message}`
+        )
         reject(new Error('error waiting for device to come online'))
       }
     })
