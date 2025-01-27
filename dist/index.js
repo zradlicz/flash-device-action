@@ -15688,8 +15688,7 @@ function waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs) {
         return new Promise((resolve, reject) => {
             const flashTimeout = setTimeout(() => {
                 try {
-                    stream.abort();
-                    stream.stopIdleTimeout();
+                    stream.end();
                 }
                 catch (cleanupError) {
                     core.warning(`Error during stream cleanup: ${cleanupError}`);
@@ -15703,11 +15702,10 @@ function waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs) {
                         core.info('device is online');
                         clearTimeout(flashTimeout);
                         try {
-                            stream.abort();
-                            stream.stopIdleTimeout();
+                            stream.end();
                         }
-                        catch (cleanupError) {
-                            core.warning(`Error during stream cleanup: ${cleanupError}`);
+                        catch (err) {
+                            core.warning(`Error during event handler stream cleanup: ${err}`);
                         }
                         resolve(true);
                     }

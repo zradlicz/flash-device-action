@@ -7,6 +7,9 @@ class MockEventStream extends EventEmitter {
   constructor() {
     super()
   }
+  end(): void {
+    return
+  }
   cancel(): void {
     return
   }

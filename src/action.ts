@@ -47,8 +47,7 @@ export async function waitForDeviceToComeOnline(
   return new Promise<boolean>((resolve, reject) => {
     const flashTimeout = setTimeout(() => {
       try {
-        stream.abort()
-        stream.stopIdleTimeout()
+        stream.end()
       } catch (cleanupError) {
         core.warning(`Error during stream cleanup: ${cleanupError}`)
       }
@@ -63,10 +62,9 @@ export async function waitForDeviceToComeOnline(
           core.info('device is online')
           clearTimeout(flashTimeout)
           try {
-            stream.abort()
-            stream.stopIdleTimeout()
-          } catch (cleanupError) {
-            core.warning(`Error during stream cleanup: ${cleanupError}`)
+            stream.end()
+          } catch (err) {
+            core.warning(`Error during event handler stream cleanup: ${err}`)
           }
           resolve(true)
         }
