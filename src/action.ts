@@ -46,23 +46,32 @@ export async function waitForDeviceToComeOnline(
 
   return new Promise<boolean>((resolve, reject) => {
     const flashTimeout = setTimeout(() => {
-      stream.abort()
-      stream.stopIdleTimeout()
+      try {
+        stream.end()
+      } catch (cleanupError) {
+        core.warning(`Error during stream cleanup: ${cleanupError}`)
+      }
       reject(new Error('timed out waiting for device to come back online'))
     }, timeoutMs)
 
     core.info('waiting for device to come online')
-    stream.on('event', (event: {data: string}) => {
+
+    stream.on('event', async (event: {data: string}) => {
       try {
         if (event.data === 'online') {
           core.info('device is online')
           clearTimeout(flashTimeout)
-          stream.abort()
-          stream.stopIdleTimeout()
+          try {
+            stream.end()
+          } catch (err) {
+            core.warning(`Error during event handler stream cleanup: ${err}`)
+          }
           resolve(true)
         }
       } catch (error) {
-        if (error instanceof Error) core.debug(error.message)
+        core.warning(
+          `Error in stream event handler: ${(error as Error).message}`
+        )
         reject(new Error('error waiting for device to come online'))
       }
     })

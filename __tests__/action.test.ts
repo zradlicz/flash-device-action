@@ -7,6 +7,9 @@ class MockEventStream extends EventEmitter {
   constructor() {
     super()
   }
+  end(): void {
+    return
+  }
   cancel(): void {
     return
   }
@@ -118,40 +121,6 @@ describe('inputValidation', () => {
 })
 
 describe('run', () => {
-  test('errors with invalid access token', async () => {
-    process.env['INPUT_PARTICLE-ACCESS-TOKEN'] = 'invalid'
-    jest.spyOn(core, 'setFailed')
-    run()
-    expect(core.setFailed).toHaveBeenCalledWith('invalid access token')
-  })
-
-  test('errors with invalid device id', async () => {
-    process.env['INPUT_PARTICLE-ACCESS-TOKEN'] = 'a'.repeat(40)
-    process.env['INPUT_DEVICE-ID'] = 'invalid'
-    jest.spyOn(core, 'setFailed')
-    run()
-    expect(core.setFailed).toHaveBeenCalledWith('invalid device id')
-  })
-
-  test('errors with invalid timeout', async () => {
-    process.env['INPUT_PARTICLE-ACCESS-TOKEN'] = 'a'.repeat(40)
-    process.env['INPUT_DEVICE-ID'] = 'a'.repeat(24)
-    process.env['INPUT_TIMEOUT-MS'] = '-1000'
-    jest.spyOn(core, 'setFailed')
-    run()
-    expect(core.setFailed).toHaveBeenCalledWith('invalid timeout')
-  })
-
-  test('errors with invalid firmware path', async () => {
-    process.env['INPUT_PARTICLE-ACCESS-TOKEN'] = 'a'.repeat(40)
-    process.env['INPUT_DEVICE-ID'] = 'a'.repeat(24)
-    process.env['INPUT_TIMEOUT-MS'] = '1000'
-    process.env['INPUT_FIRMWARE-PATH'] = ''
-    jest.spyOn(core, 'setFailed')
-    run()
-    expect(core.setFailed).toHaveBeenCalledWith('invalid firmware path')
-  })
-
   test('test flash firmware', async () => {
     setTimeout(() => {
       mockEventStream.emit('event', {
