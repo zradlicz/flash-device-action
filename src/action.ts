@@ -117,6 +117,10 @@ export async function run(): Promise<void> {
       throw new Error('invalid firmware path')
     }
 
+    // Wait for the device to come online before flashing
+    core.info('waiting for device to come online before flashing')
+    await waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs)
+
     core.info('flashing firmware')
 
     await flashFirmware({
@@ -127,7 +131,16 @@ export async function run(): Promise<void> {
     })
 
     core.info('complete!')
+    
+    // Add a small delay and then explicitly exit the process
+    setTimeout(() => {
+      process.exit(0)
+    }, 2000) // 2 second delay to allow any remaining logs to flush
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
+    // Exit with error code
+    setTimeout(() => {
+      process.exit(1)
+    }, 2000) // 2 second delay to allow any remaining logs to flush
   }
 }

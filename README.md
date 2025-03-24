@@ -1,3 +1,7 @@
+#Fork of Particle Flash Device Action
+Changes include:
+- Waiting for connection before beginning to flash firmware
+
 # Particle Flash Device Action
 [![Build and Test](https://github.com/particle-iot/flash-device-action/actions/workflows/test.yml/badge.svg)](https://github.com/particle-iot/flash-device-action/actions/workflows/test.yml)
 
