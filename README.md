@@ -28,7 +28,7 @@ Other Actions for firmware development: [Compile](https://github.com/particle-io
 
     # Time in ms to wait for the device to come back online after flashing
     # Required: false
-    timeout-ms: '300000'
+    timeout-ms: '600000'
 ```
 
 Also see official [Particle documentation](https://docs.particle.io/firmware/best-practices/github-actions/) for more details.

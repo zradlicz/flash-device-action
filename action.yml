@@ -13,7 +13,7 @@ inputs:
     description: "Path to firmware binary"
   timeout-ms:
     required: false
-    default: "300000"
+    default: "600000"
     description: "Time in ms to wait for the device to come back online after flashing"
 runs:
   using: "node20"

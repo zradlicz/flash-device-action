@@ -15654,7 +15654,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.run = exports.validFirmwarePath = exports.validTimeoutMs = exports.validDeviceId = exports.validAccessToken = exports.waitForDeviceToComeOnline = exports.flashFirmware = void 0;
+exports.run = exports.validFirmwarePath = exports.validTimeoutMs = exports.validDeviceId = exports.validAccessToken = exports.waitForDeviceToComeOnline = exports.waitForFlashSuccess = exports.flashFirmware = void 0;
 const core = __importStar(__nccwpck_require__(7484));
 const particle_api_js_1 = __importDefault(__nccwpck_require__(5788));
 const particle = new particle_api_js_1.default();
@@ -15674,10 +15674,53 @@ function flashFirmware(inputs) {
         });
         core.info('firmware update started');
         // Wait for the flash to complete
+        yield waitForFlashSuccess(deviceId, accessToken, timeoutMs);
+        //wait for the device to come back online
         yield waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs);
     });
 }
 exports.flashFirmware = flashFirmware;
+function waitForFlashSuccess(deviceId, accessToken, timeoutMs) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const stream = yield particle.getEventStream({
+            deviceId,
+            auth: accessToken,
+            name: 'spark/flash/status'
+        });
+        return new Promise((resolve, reject) => {
+            const flashTimeout = setTimeout(() => {
+                try {
+                    stream.end();
+                }
+                catch (cleanupError) {
+                    core.warning(`Error during stream cleanup: ${cleanupError}`);
+                }
+                reject(new Error('timed out waiting for flash success'));
+            }, timeoutMs);
+            core.info('waiting for flash success');
+            stream.on('event', (event) => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    if (event.data === 'success') {
+                        core.info('flash is successful');
+                        clearTimeout(flashTimeout);
+                        try {
+                            stream.end();
+                        }
+                        catch (err) {
+                            core.warning(`Error during event handler stream cleanup: ${err}`);
+                        }
+                        resolve(true);
+                    }
+                }
+                catch (error) {
+                    core.warning(`Error in stream event handler: ${error.message}`);
+                    reject(new Error('error waiting for flash success'));
+                }
+            }));
+        });
+    });
+}
+exports.waitForFlashSuccess = waitForFlashSuccess;
 function waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs) {
     return __awaiter(this, void 0, void 0, function* () {
         const stream = yield particle.getEventStream({
@@ -15755,7 +15798,6 @@ function run() {
                 throw new Error('invalid firmware path');
             }
             // Wait for the device to come online before flashing
-            core.info('waiting for device to come online before flashing');
             yield waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs);
             core.info('flashing firmware');
             yield flashFirmware({

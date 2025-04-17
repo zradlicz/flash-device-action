@@ -31,8 +31,57 @@ export async function flashFirmware(
   core.info('firmware update started')
 
   // Wait for the flash to complete
+  await waitForFlashSuccess(deviceId, accessToken, timeoutMs)
+
+  //wait for the device to come back online
   await waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs)
 }
+
+export async function waitForFlashSuccess(
+  deviceId: string,
+  accessToken: string,
+  timeoutMs: number
+): Promise<boolean> {
+  const stream = await particle.getEventStream({
+    deviceId,
+    auth: accessToken,
+    name: 'spark/flash/status'
+  })
+
+  return new Promise<boolean>((resolve, reject) => {
+    const flashTimeout = setTimeout(() => {
+      try {
+        stream.end()
+      } catch (cleanupError) {
+        core.warning(`Error during stream cleanup: ${cleanupError}`)
+      }
+      reject(new Error('timed out waiting for flash success'))
+    }, timeoutMs)
+
+    core.info('waiting for flash success')
+
+    stream.on('event', async (event: {data: string}) => {
+      try {
+        if (event.data === 'success') {
+          core.info('flash is successful')
+          clearTimeout(flashTimeout)
+          try {
+            stream.end()
+          } catch (err) {
+            core.warning(`Error during event handler stream cleanup: ${err}`)
+          }
+          resolve(true)
+        }
+      } catch (error) {
+        core.warning(
+          `Error in stream event handler: ${(error as Error).message}`
+        )
+        reject(new Error('error waiting for flash success'))
+      }
+    })
+  })
+}
+
 export async function waitForDeviceToComeOnline(
   deviceId: string,
   accessToken: string,
@@ -118,7 +167,6 @@ export async function run(): Promise<void> {
     }
 
     // Wait for the device to come online before flashing
-    core.info('waiting for device to come online before flashing')
     await waitForDeviceToComeOnline(deviceId, accessToken, timeoutMs)
 
     core.info('flashing firmware')
